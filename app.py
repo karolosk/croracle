@@ -14,6 +14,8 @@ external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+server = app.server
+
 app.layout = html.Div(
     [
         html.Div(
@@ -25,7 +27,7 @@ app.layout = html.Div(
         ),
         dcc.Upload(
             id="upload-data",
-            children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
+            children=html.Div(["Drag and Drop or ", html.A("Select File")]),
             style={
                 "height": "60px",
                 "lineHeight": "60px",
@@ -62,7 +64,7 @@ def parse_contents(contents, filename, date):
         lambda x: x.date()
     )
     df["YearMonth"] = (
-            df["Timestamp (UTC)"] + pd.offsets.MonthEnd(-1) + pd.offsets.Day(1)
+        df["Timestamp (UTC)"] + pd.offsets.MonthEnd(-1) + pd.offsets.Day(1)
     )
     # EARN
     df_earn = df[(df["Transaction Kind"] == "crypto_earn_interest_paid")]
@@ -119,16 +121,22 @@ def parse_contents(contents, filename, date):
     # purchase
     df_crypto_purchase = df[(df["Transaction Kind"] == "crypto_purchase")]
     df_crypto_purchase["Transaction Description"] = df_crypto_purchase[
-        "Transaction Description"].str.replace("Buy", "")
+        "Transaction Description"
+    ].str.replace("Buy", "")
     df_crypto_purchase_grouped_type = df_crypto_purchase.groupby(
         ["Transaction Kind", "Transaction Description"], as_index=False
     ).sum()
-    df_crypto_purchase_grouped_type["Transaction Description"] = df_crypto_purchase_grouped_type[
-        "Transaction Description"].str.replace("Buy", "")
+    df_crypto_purchase_grouped_type[
+        "Transaction Description"
+    ] = df_crypto_purchase_grouped_type["Transaction Description"].str.replace(
+        "Buy", ""
+    )
     df_crypto_purchase_grouped = df_crypto_purchase.groupby(["Transaction Kind"]).sum()
-    df_crypto_purchase_grouped_type_date = df_crypto_purchase.groupby(["YearMonth"],
-                                                                      as_index=False).sum().sort_values(by='YearMonth')
-
+    df_crypto_purchase_grouped_type_date = (
+        df_crypto_purchase.groupby(["YearMonth"], as_index=False)
+        .sum()
+        .sort_values(by="YearMonth")
+    )
 
     return html.Div(
         [
@@ -208,52 +216,55 @@ def parse_contents(contents, filename, date):
                         className="total-info",
                         children=[
                             dcc.Graph(
-                                id='purchases-graph',
+                                id="purchases-graph",
                                 figure={
-                                    'data': [
+                                    "data": [
                                         {
-                                            'x': df_crypto_purchase_grouped_type["Transaction Description"],
-                                            'y': df_crypto_purchase_grouped_type["Native Amount"],
-                                            'type': 'bar',
+                                            "x": df_crypto_purchase_grouped_type[
+                                                "Transaction Description"
+                                            ],
+                                            "y": df_crypto_purchase_grouped_type[
+                                                "Native Amount"
+                                            ],
+                                            "type": "bar",
                                             # 'marker': {
                                             #     'color': ['rgb(26, 118, 255)', 'rgb(177, 35, 5)', 'rgb(126, 170, 121)',
                                             #               'rgb(255, 102, 0)']}
                                         },
                                     ],
-                                    'layout': {
-                                        'title': 'Purchases in native currency',
-                                        'annotations': 'annotations'
-                                    }
-                                }
+                                    "layout": {
+                                        "title": "Purchases in native currency",
+                                        "annotations": "annotations",
+                                    },
+                                },
                             ),
                             dcc.Graph(
-                                id='purchases-graph',
+                                id="purchases-graph",
                                 figure={
-                                    'data': [
+                                    "data": [
                                         dict(
-                                            x=df_crypto_purchase_grouped_type_date["YearMonth"],
-                                            y=df_crypto_purchase_grouped_type_date["Native Amount"],
-                                            name='Purchases',
-                                            marker=dict(
-                                                color='rgb(177, 35, 5)'
-                                            )
+                                            x=df_crypto_purchase_grouped_type_date[
+                                                "YearMonth"
+                                            ],
+                                            y=df_crypto_purchase_grouped_type_date[
+                                                "Native Amount"
+                                            ],
+                                            name="Purchases",
+                                            marker=dict(color="rgb(177, 35, 5)"),
                                         ),
                                     ],
-                                    'layout': {
-                                        'title': 'Purchases Timeline',
-                                        'annotations': 'annotations',
-                                        'xaxis': {
-                                            "showticklabels": True
-                                        },
-                                        "legend": {
-                                            "x": 0,
-                                            "y": 1.0
-                                        }
-                                    }
-                                }
+                                    "layout": {
+                                        "title": "Purchases Timeline",
+                                        "annotations": "annotations",
+                                        "xaxis": {"showticklabels": True},
+                                        "legend": {"x": 0, "y": 1.0},
+                                    },
+                                },
                             ),
-                        ], )
-                ]),
+                        ],
+                    )
+                ],
+            ),
             html.Hr(),
             html.H3("Breakdown Earnings", className="row-header"),
             html.Div(
