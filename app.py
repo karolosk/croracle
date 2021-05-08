@@ -18,12 +18,12 @@ server = app.server
 app.index_string = """<!DOCTYPE html>
 <html>
     <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=271734030"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-6V70GQL792"></script>
         <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '271734030');
+        gtag('config', 'G-6V70GQL792');
         </script>
         {%metas%}
         <title>croracle</title>
