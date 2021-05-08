@@ -72,16 +72,17 @@ table {
 }
 
 .row-header {
+    text-align: center;
     margin: 10px;
 }
 .row-info {
     text-align:center;
-    display: flex;
     margin: 10px;
 }
 
-.row-content {
-
+.row-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
 p {
