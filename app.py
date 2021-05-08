@@ -40,7 +40,6 @@ app.index_string = """<!DOCTYPE html>
     </body>
 </html>"""
 
-
 app.layout = html.Div(
     [
         html.Div(
@@ -88,7 +87,7 @@ def parse_contents(contents, filename, date):
         lambda x: x.date()
     )
     df["YearMonth"] = (
-            df["Timestamp (UTC)"] + pd.offsets.MonthEnd(-1) + pd.offsets.Day(1)
+        df["Timestamp (UTC)"] + pd.offsets.MonthEnd(-1) + pd.offsets.Day(1)
     )
     # EARN
     df_earn = df[(df["Transaction Kind"] == "crypto_earn_interest_paid")]
@@ -158,8 +157,8 @@ def parse_contents(contents, filename, date):
     df_crypto_purchase_grouped = df_crypto_purchase.groupby(["Transaction Kind"]).sum()
     df_crypto_purchase_grouped_type_date = (
         df_crypto_purchase.groupby(["YearMonth"], as_index=False)
-            .sum()
-            .sort_values(by="YearMonth")
+        .sum()
+        .sort_values(by="YearMonth")
     )
 
     native_currency = df["Native Currency"][0]
@@ -192,7 +191,8 @@ def parse_contents(contents, filename, date):
                                         className="total-info-data",
                                     ),
                                     html.Span(
-                                        f" {native_currency}", className="total-info-label"
+                                        f" {native_currency}",
+                                        className="total-info-label",
                                     ),
                                 ],
                             ),
@@ -209,9 +209,7 @@ def parse_contents(contents, filename, date):
                                         ),
                                         className="total-info-data",
                                     ),
-                                    html.Span(
-                                        f" USD", className="total-info-label"
-                                    ),
+                                    html.Span(f" USD", className="total-info-label"),
                                 ],
                                 className="total-info-data",
                             ),
@@ -224,9 +222,13 @@ def parse_contents(contents, filename, date):
                             html.P(
                                 children=[
                                     html.Span(
-                                        round(float(df_earnings["Native Amount"].sum()), 2), ),
+                                        round(
+                                            float(df_earnings["Native Amount"].sum()), 2
+                                        ),
+                                    ),
                                     html.Span(
-                                        f" {native_currency}", className="total-info-label"
+                                        f" {native_currency}",
+                                        className="total-info-label",
                                     ),
                                 ],
                                 className="total-info-data",
@@ -234,10 +236,16 @@ def parse_contents(contents, filename, date):
                             html.P(
                                 children=[
                                     html.Span(
-                                        round(float(df_earnings["Native Amount (in USD)"].sum()), 2), ),
-                                    html.Span(
-                                        f" USD", className="total-info-label"
+                                        round(
+                                            float(
+                                                df_earnings[
+                                                    "Native Amount (in USD)"
+                                                ].sum()
+                                            ),
+                                            2,
+                                        ),
                                     ),
+                                    html.Span(f" USD", className="total-info-label"),
                                 ],
                                 className="total-info-data",
                             ),
@@ -248,7 +256,6 @@ def parse_contents(contents, filename, date):
             ),
             html.Hr(),
             html.H3("Breakdown Purchases", className="row-header"),
-
             html.Div(
                 className="row-wrapper",
                 children=[
@@ -279,9 +286,7 @@ def parse_contents(contents, filename, date):
                         figure={
                             "data": [
                                 dict(
-                                    x=df_crypto_purchase_grouped_type_date[
-                                        "YearMonth"
-                                    ],
+                                    x=df_crypto_purchase_grouped_type_date["YearMonth"],
                                     y=df_crypto_purchase_grouped_type_date[
                                         "Native Amount"
                                     ],
@@ -298,45 +303,49 @@ def parse_contents(contents, filename, date):
                     ),
                 ],
             ),
-
             html.Hr(),
             html.H3("Breakdown Earnings", className="row-header"),
             html.Div(
-                className="row-info",
+                className="row-wrapper",
                 children=[
                     html.Div(
                         className="total-info",
                         children=[
                             html.H5("Card cashback"),
                             html.P(
-                                "Total Card cashback (Native Currency)",
-                                className="total-info-label",
-                            ),
-                            html.P(
-                                round(
-                                    float(
-                                        df_referral_card_cashback_grouped[
-                                            "Native Amount"
-                                        ]
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(
+                                                df_referral_card_cashback_grouped[
+                                                    "Native Amount"
+                                                ]
+                                            ),
+                                            2,
+                                        ),
+                                        className="total-info-data",
                                     ),
-                                    2,
-                                ),
-                                className="total-info-data",
-                            ),
-                            html.P(
-                                "Total Card cashback (USD)",
-                                className="total-info-label",
-                            ),
-                            html.P(
-                                round(
-                                    float(
-                                        df_referral_card_cashback_grouped[
-                                            "Native Amount (in USD)"
-                                        ]
+                                    html.Span(
+                                        f" {native_currency}",
+                                        className="total-info-label",
                                     ),
-                                    2,
-                                ),
-                                className="total-info-data",
+                                ],
+                            ),
+                            html.P(
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(
+                                                df_referral_card_cashback_grouped[
+                                                    "Native Amount (in USD)"
+                                                ]
+                                            ),
+                                            2,
+                                        ),
+                                        className="total-info-data",
+                                    ),
+                                    html.Span(f" USD", className="total-info-label"),
+                                ],
                             ),
                         ],
                     ),
@@ -345,22 +354,34 @@ def parse_contents(contents, filename, date):
                         children=[
                             html.H5("Stake rewards"),
                             html.P(
-                                "Total Stake rewards (Native Currency)",
-                                className="total-info-label",
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(df_stake_grouped["Native Amount"]), 2
+                                        ),
+                                        className="total-info-data",
+                                    ),
+                                    html.Span(
+                                        f" {native_currency}",
+                                        className="total-info-label",
+                                    ),
+                                ]
                             ),
                             html.P(
-                                round(float(df_stake_grouped["Native Amount"]), 2),
-                                className="total-info-data",
-                            ),
-                            html.P(
-                                "Total Stake rewards (USD)",
-                                className="total-info-label",
-                            ),
-                            html.P(
-                                round(
-                                    float(df_stake_grouped["Native Amount (in USD)"]), 2
-                                ),
-                                className="total-info-data",
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(
+                                                df_stake_grouped[
+                                                    "Native Amount (in USD)"
+                                                ]
+                                            ),
+                                            2,
+                                        ),
+                                        className="total-info-data",
+                                    ),
+                                    html.Span(f" USD", className="total-info-label"),
+                                ]
                             ),
                         ],
                     ),
@@ -369,19 +390,34 @@ def parse_contents(contents, filename, date):
                         children=[
                             html.H5("Earn"),
                             html.P(
-                                "Total Earn (Native Currency)",
-                                className="total-info-label",
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(df_earn_grouped["Native Amount"]), 2
+                                        ),
+                                        className="total-info-data",
+                                    ),
+                                    html.Span(
+                                        f" {native_currency}",
+                                        className="total-info-label",
+                                    ),
+                                ]
                             ),
                             html.P(
-                                round(float(df_earn_grouped["Native Amount"]), 2),
-                                className="total-info-data",
-                            ),
-                            html.P("Total Earn (USD)", className="total-info-label"),
-                            html.P(
-                                round(
-                                    float(df_earn_grouped["Native Amount (in USD)"]), 2
-                                ),
-                                className="total-info-data",
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(
+                                                df_earn_grouped[
+                                                    "Native Amount (in USD)"
+                                                ]
+                                            ),
+                                            2,
+                                        ),
+                                        className="total-info-data",
+                                    ),
+                                    html.Span(f" USD", className="total-info-label"),
+                                ]
                             ),
                         ],
                     ),
@@ -390,29 +426,39 @@ def parse_contents(contents, filename, date):
                         children=[
                             html.H5("Reimbursement"),
                             html.P(
-                                "Total Reimbursement (Native Currency)",
-                                className="total-info-label",
-                            ),
-                            html.P(
-                                round(
-                                    float(df_reimbursement_grouped["Native Amount"]), 2
-                                ),
-                                className="total-info-data",
-                            ),
-                            html.P(
-                                "Total Reimbursement (USD)",
-                                className="total-info-label",
-                            ),
-                            html.P(
-                                round(
-                                    float(
-                                        df_reimbursement_grouped[
-                                            "Native Amount (in USD)"
-                                        ]
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(
+                                                df_reimbursement_grouped[
+                                                    "Native Amount"
+                                                ]
+                                            ),
+                                            2,
+                                        ),
+                                        className="total-info-data",
                                     ),
-                                    2,
-                                ),
-                                className="total-info-data",
+                                    html.Span(
+                                        f" {native_currency}",
+                                        className="total-info-label",
+                                    ),
+                                ]
+                            ),
+                            html.P(
+                                [
+                                    html.Span(
+                                        round(
+                                            float(
+                                                df_reimbursement_grouped[
+                                                    "Native Amount (in USD)"
+                                                ]
+                                            ),
+                                            2,
+                                        ),
+                                        className="total-info-data",
+                                    ),
+                                    html.Span(f" USD", className="total-info-label"),
+                                ]
                             ),
                         ],
                     ),
@@ -421,52 +467,62 @@ def parse_contents(contents, filename, date):
                         children=[
                             html.H5("Referral Gift"),
                             html.P(
-                                "Total Referral Gift (Native Currency)",
-                                className="total-info-label",
-                            ),
-                            html.P(
-                                round(
-                                    float(df_referral_gift_grouped["Native Amount"]), 2
-                                ),
-                                className="total-info-data",
-                            ),
-                            html.P(
-                                "Total Referral Gift (USD)",
-                                className="total-info-label",
-                            ),
-                            html.P(
-                                round(
-                                    float(
-                                        df_referral_gift_grouped[
-                                            "Native Amount (in USD)"
-                                        ]
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(df_referral_gift_grouped["Native Amount"]), 2
+                                        ),
+                                        className="total-info-data",
                                     ),
-                                    2,
-                                ),
-                                className="total-info-data",
+                                    html.Span(
+                                        f" {native_currency}",
+                                        className="total-info-label",
+                                    ),
+                                ]
+
+                            ),
+                            html.P(
+                                children=[
+                                    html.Span(
+                                        round(
+                                            float(
+                                                df_referral_gift_grouped[
+                                                    "Native Amount (in USD)"
+                                                ]
+                                            ),
+                                            2,
+                                        ),
+                                        className="total-info-data",
+                                    ),
+                                    html.Span(
+                                        f" USD",
+                                        className="total-info-label",
+                                    ),
+                                ]
+
                             ),
                         ],
                     ),
-                    html.Div(
-                        className="total-info",
-                        children=[
-                            dcc.Graph(
-                                id="example-graph",
-                                style={"display": "inline-block"},
-                                figure=go.Figure(
-                                    data=[
-                                        go.Pie(
-                                            labels=df_earnings_grouped[
-                                                "Transaction Kind"
-                                            ],
-                                            values=df_earnings_grouped["Native Amount"],
-                                        )
+                ],
+            ),
+            html.Div(
+                className="total-info",
+                children=[
+                    dcc.Graph(
+                        id="example-graph",
+                        style={"display": "inline-block"},
+                        figure=go.Figure(
+                            data=[
+                                go.Pie(
+                                    labels=df_earnings_grouped[
+                                        "Transaction Kind"
                                     ],
-                                    layout=go.Layout(title="Earnings"),
-                                ),
-                            )
-                        ],
-                    ),
+                                    values=df_earnings_grouped["Native Amount"],
+                                )
+                            ],
+                            layout=go.Layout(title="Earnings"),
+                        ),
+                    )
                 ],
             ),
             html.Hr(),  # horizontal line
