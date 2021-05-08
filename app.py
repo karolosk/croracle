@@ -26,7 +26,7 @@ app.index_string = """<!DOCTYPE html>
         gtag('config', 'G-6V70GQL792');
         </script>
         {%metas%}
-        <title>croracle</title>
+        <title>Croracle</title>
         {%favicon%}
         {%css%}
     </head>
