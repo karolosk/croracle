@@ -161,35 +161,25 @@ def parse_contents(contents, filename, date):
 
     # purchase
     df_crypto_purchase = df[(df["Transaction Kind"] == "crypto_purchase")]
-    df_crypto_purchase["Transaction Description"] = df_crypto_purchase[
-        "Transaction Description"
-    ].str.replace("Buy", "")
-    df_crypto_purchase_grouped_type = df_crypto_purchase.groupby(
-        ["Transaction Kind", "Transaction Description"], as_index=False
-    ).sum()
-    df_crypto_purchase_grouped_type[
-        "Transaction Description"
-    ] = df_crypto_purchase_grouped_type["Transaction Description"].str.replace(
-        "Buy", ""
-    )
+    df_crypto_purchase["Transaction Description"] = df_crypto_purchase["Transaction Description"].str.replace("Buy", "")
+    df_crypto_purchase_grouped_type = df_crypto_purchase.groupby(["Transaction Kind", "Transaction Description"], as_index=False).sum()
+    df_crypto_purchase_grouped_type["Transaction Description"] = df_crypto_purchase_grouped_type["Transaction Description"].str.replace("Buy", "")
     df_crypto_purchase_grouped = df_crypto_purchase.groupby(["Transaction Kind"]).sum()
-    df_crypto_purchase_grouped_type_date = (
-        df_crypto_purchase.groupby(["YearMonth"], as_index=False)
-            .sum()
-            .sort_values(by="YearMonth")
-    )
+    df_crypto_purchase_grouped_type_date = (df_crypto_purchase.groupby(["YearMonth"], as_index=False).sum().sort_values(by="YearMonth"))
 
-    df_crypto_earnings_grouped_type_date = (
-        df_earnings.groupby(["YearMonth"], as_index=False).sum().sort_values(by="YearMonth"))
+    df_crypto_earnings_grouped_type_date = (df_earnings.groupby(["YearMonth"], as_index=False).sum().sort_values(by="YearMonth"))
 
-    crypto_purchase_grouped_type_date_type_fig = px.scatter(data_frame=df_crypto_purchase,
-                                                            x=df_crypto_purchase["Timestamp (UTC)"],
-                                                            y=df_crypto_purchase[
-                                                                "Native Amount"],
-                                                            color=df_crypto_purchase[
-                                                                "Transaction Description"],
-                                                            size=df_crypto_purchase[
-                                                                "Native Amount"], )
+    if df_crypto_purchase.empty:
+        crypto_purchase_grouped_type_date_type_fig = px.scatter()
+    else:
+        crypto_purchase_grouped_type_date_type_fig = px.scatter(data_frame=df_crypto_purchase,
+                                                                x=df_crypto_purchase["Timestamp (UTC)"],
+                                                                y=df_crypto_purchase[
+                                                                    "Native Amount"],
+                                                                color=df_crypto_purchase[
+                                                                    "Transaction Description"],
+                                                                size=df_crypto_purchase[
+                                                                    "Native Amount"], )
 
     crypto_purchase_grouped_type_date_type_fig.update_layout(
         title={
@@ -199,14 +189,17 @@ def parse_contents(contents, filename, date):
             'xanchor': 'center',
             'yanchor': 'top'})
 
-    crypto_earnings_grouped_type_date_type_fig = px.scatter(data_frame=df_earnings,
-                                                            x=df_earnings["Timestamp (UTC)"],
-                                                            y=df_earnings[
-                                                                "Native Amount"],
-                                                            color=df_earnings[
-                                                                "Transaction Description"],
-                                                            size=df_earnings[
-                                                                "Native Amount"], )
+    if df_earnings.empty:
+        crypto_earnings_grouped_type_date_type_fig = px.scatter()
+    else:
+        crypto_earnings_grouped_type_date_type_fig = px.scatter(data_frame=df_earnings,
+                                                                x=df_earnings["Timestamp (UTC)"],
+                                                                y=df_earnings[
+                                                                    "Native Amount"],
+                                                                color=df_earnings[
+                                                                    "Transaction Description"],
+                                                                size=df_earnings[
+                                                                    "Native Amount"], )
 
     crypto_earnings_grouped_type_date_type_fig.update_layout(
         title={
@@ -217,6 +210,9 @@ def parse_contents(contents, filename, date):
             'yanchor': 'top'})
 
     native_currency = df["Native Currency"][0]
+
+    if df_earnings.empty or df_crypto_purchase.empty:
+        return html.Div(["Please make sure that both purchases and earnings exist in the file."])
 
     return html.Div(
         [
