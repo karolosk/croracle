@@ -92,29 +92,46 @@ def parse_contents(contents, filename, date):
     )
     # EARN
     df_earn = df[(df["Transaction Kind"] == "crypto_earn_interest_paid")]
-    df_earn_grouped = df_earn.groupby("Transaction Kind").sum()
+    if df_earn.empty:
+        data = {'Native Amount': [0], 'Native Amount (in USD)': [0]}
+        df_earn_grouped = pd.DataFrame(data, columns=['Native Amount', 'Native Amount (in USD)'])
+    else:
+        df_earn_grouped = df_earn.groupby("Transaction Kind").sum()
 
     df_reimbursement = df[(df["Transaction Kind"] == "reimbursement")]
-    df_reimbursement_grouped_type = df_reimbursement.groupby(
-        ["Transaction Kind", "Transaction Description"]
-    ).sum()
-    df_reimbursement_grouped = df_reimbursement.groupby(["Transaction Kind"]).sum()
+    if df_reimbursement.empty:
+        data = {'Native Amount': [0], 'Native Amount (in USD)': [0]}
+        df_reimbursement_grouped = pd.DataFrame(data, columns=['Native Amount', 'Native Amount (in USD)'])
+    else:
+        df_reimbursement_grouped = df_reimbursement.groupby(["Transaction Kind"]).sum()
 
     df_stake = df[(df["Transaction Kind"] == "mco_stake_reward")]
-    df_stake_grouped = df_stake.groupby(
-        ["Transaction Kind", "Transaction Description"]
-    ).sum()
+    if df_stake.empty:
+        data = {'Native Amount': [0], 'Native Amount (in USD)': [0]}
+        df_stake_grouped = pd.DataFrame(data, columns=['Native Amount', 'Native Amount (in USD)'])
+    else:
+        df_stake_grouped = df_stake.groupby(
+            ["Transaction Kind", "Transaction Description"]
+        ).sum()
 
     df_referral_card_cashback = df[(df["Transaction Kind"] == "referral_card_cashback")]
-    df_referral_card_cashback_grouped = df_referral_card_cashback.groupby(
-        ["Transaction Kind", "Transaction Description"]
-    ).sum()
+    if df_referral_card_cashback.empty:
+        data = {'Native Amount': [0], 'Native Amount (in USD)': [0]}
+        df_referral_card_cashback_grouped = pd.DataFrame(data, columns=['Native Amount', 'Native Amount (in USD)'])
+    else:
+        df_referral_card_cashback_grouped = df_referral_card_cashback.groupby(
+            ["Transaction Kind", "Transaction Description"]
+        ).sum()
 
     # referral gift
     df_referral_gift = df[(df["Transaction Kind"] == "referral_gift")]
-    df_referral_gift_grouped = df_referral_gift.groupby(
-        ["Transaction Kind", "Transaction Description"]
-    ).sum()
+    if df_referral_gift.empty:
+        data = {'Native Amount': [0], 'Native Amount (in USD)': [0]}
+        df_referral_gift_grouped = pd.DataFrame(data, columns=['Native Amount', 'Native Amount (in USD)'])
+    else:
+        df_referral_gift_grouped = df_referral_gift.groupby(
+            ["Transaction Kind", "Transaction Description"]
+        ).sum()
 
     # Earnings
     df_earnings = pd.concat(
@@ -162,7 +179,8 @@ def parse_contents(contents, filename, date):
             .sort_values(by="YearMonth")
     )
 
-    df_crypto_earnings_grouped_type_date = (df_earnings.groupby(["YearMonth"], as_index=False).sum().sort_values(by="YearMonth"))
+    df_crypto_earnings_grouped_type_date = (
+        df_earnings.groupby(["YearMonth"], as_index=False).sum().sort_values(by="YearMonth"))
 
     crypto_purchase_grouped_type_date_type_fig = px.scatter(data_frame=df_crypto_purchase,
                                                             x=df_crypto_purchase["Timestamp (UTC)"],
@@ -502,6 +520,7 @@ def parse_contents(contents, filename, date):
                             ),
                         ],
                     ),
+
                     html.Div(
                         className="total-info",
                         children=[
@@ -582,7 +601,7 @@ def parse_contents(contents, filename, date):
                                 "annotations": "annotations",
                                 "legend": {"x": 0, "y": 1.0},
                             },
-                        },),
+                        }, ),
                 ],
             ),
             html.Div(
