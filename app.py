@@ -6,6 +6,7 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import plotly.express as px
 
 import pandas as pd
 
@@ -87,7 +88,7 @@ def parse_contents(contents, filename, date):
         lambda x: x.date()
     )
     df["YearMonth"] = (
-        df["Timestamp (UTC)"] + pd.offsets.MonthEnd(-1) + pd.offsets.Day(1)
+            df["Timestamp (UTC)"] + pd.offsets.MonthEnd(-1) + pd.offsets.Day(1)
     )
     # EARN
     df_earn = df[(df["Transaction Kind"] == "crypto_earn_interest_paid")]
@@ -157,20 +158,50 @@ def parse_contents(contents, filename, date):
     df_crypto_purchase_grouped = df_crypto_purchase.groupby(["Transaction Kind"]).sum()
     df_crypto_purchase_grouped_type_date = (
         df_crypto_purchase.groupby(["YearMonth"], as_index=False)
-        .sum()
-        .sort_values(by="YearMonth")
+            .sum()
+            .sort_values(by="YearMonth")
     )
+
+    df_crypto_earnings_grouped_type_date = (df_earnings.groupby(["YearMonth"], as_index=False).sum().sort_values(by="YearMonth"))
+
+    crypto_purchase_grouped_type_date_type_fig = px.scatter(data_frame=df_crypto_purchase,
+                                                            x=df_crypto_purchase["Timestamp (UTC)"],
+                                                            y=df_crypto_purchase[
+                                                                "Native Amount"],
+                                                            color=df_crypto_purchase[
+                                                                "Transaction Description"],
+                                                            size=df_crypto_purchase[
+                                                                "Native Amount"], )
+
+    crypto_purchase_grouped_type_date_type_fig.update_layout(
+        title={
+            'text': "Purchases Timestamp/Coin",
+            'y': 1,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'})
+
+    crypto_earnings_grouped_type_date_type_fig = px.scatter(data_frame=df_earnings,
+                                                            x=df_earnings["Timestamp (UTC)"],
+                                                            y=df_earnings[
+                                                                "Native Amount"],
+                                                            color=df_earnings[
+                                                                "Transaction Description"],
+                                                            size=df_earnings[
+                                                                "Native Amount"], )
+
+    crypto_earnings_grouped_type_date_type_fig.update_layout(
+        title={
+            'text': "Earnings Timestamp/Type",
+            'y': 0.9,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'})
 
     native_currency = df["Native Currency"][0]
 
     return html.Div(
         [
-            html.H4(
-                "from: "
-                + str(df["Timestamp (UTC)"].min())
-                + " to: "
-                + str(df["Timestamp (UTC)"].max())
-            ),
             html.Div(
                 className="row-wrapper",
                 children=[
@@ -214,7 +245,7 @@ def parse_contents(contents, filename, date):
                                 className="total-info-data",
                             ),
                         ],
-                        className="row-content",
+                        className="total-info",
                     ),
                     html.Div(
                         [
@@ -250,7 +281,7 @@ def parse_contents(contents, filename, date):
                                 className="total-info-data",
                             ),
                         ],
-                        className="row-content",
+                        className="total-info",
                     ),
                 ],
             ),
@@ -303,10 +334,19 @@ def parse_contents(contents, filename, date):
                     ),
                 ],
             ),
+            html.Div(
+                children=[
+                    dcc.Graph(
+                        className="row-content",
+                        id="purchases-timeline-type",
+                        figure=crypto_purchase_grouped_type_date_type_fig
+                    ),
+                ],
+            ),
             html.Hr(),
             html.H3("Breakdown Earnings", className="row-header"),
             html.Div(
-                className="row-wrapper",
+                className="row-wrapper-earn",
                 children=[
                     html.Div(
                         className="total-info",
@@ -506,7 +546,7 @@ def parse_contents(contents, filename, date):
                 ],
             ),
             html.Div(
-                className="total-info",
+                className="row-wrapper",
                 children=[
                     dcc.Graph(
                         id="example-graph",
@@ -522,7 +562,36 @@ def parse_contents(contents, filename, date):
                             ],
                             layout=go.Layout(title="Earnings"),
                         ),
-                    )
+                    ),
+                    dcc.Graph(
+                        className="row-content",
+                        id="earnings-timeline",
+                        figure={
+                            "data": [
+                                dict(
+                                    x=df_crypto_earnings_grouped_type_date["YearMonth"],
+                                    y=df_crypto_earnings_grouped_type_date[
+                                        "Native Amount"
+                                    ],
+                                    name="Purchases",
+                                    marker=dict(color="rgb(177, 35, 5)"),
+                                ),
+                            ],
+                            "layout": {
+                                "title": f"Earnings Timeline ({native_currency})",
+                                "annotations": "annotations",
+                                "legend": {"x": 0, "y": 1.0},
+                            },
+                        },),
+                ],
+            ),
+            html.Div(
+                children=[
+                    dcc.Graph(
+                        className="row-content",
+                        id="earnings-timeline-type",
+                        figure=crypto_earnings_grouped_type_date_type_fig
+                    ),
                 ],
             ),
             html.Hr(),  # horizontal line
