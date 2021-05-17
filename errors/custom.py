@@ -1,9 +1,5 @@
 class FileMissingColumn(Exception):
-    """Exception raised for errors in the input salary.
-
-        Attributes:
-            salary -- input salary which caused the error
-            message -- explanation of the error
+    """Exception raised for missing cols in file.
     """
 
     def __init__(self, message="Missing required columns from given file."):
